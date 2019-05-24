@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 from scipy import stats
-import sklearn
 import math
+from sklearn import linear_model
 
 #Importing default rate data
 output = pd.read_excel("/home/bosko/Desktop/model-calculation/banks_europe.xlsx")
@@ -38,8 +38,17 @@ macro_data['Property_YoY'] = 100 * (Property - Property_lag)/Property_lag
 macro_data.drop(columns=['GDP', 'Property'], inplace=True)
 macro_data.rename(columns={'GDP_YoY': 'GDP', 'Property_YoY': 'Property'}, inplace=True)
 
+#Creating lagged values of macroeconomic data
+macro_data_lagged = pd.DataFrame()
+
 for column in macro_data:
     if column != 'year':
-        macro_data[column + '1']= macro_data[column].shift(1)
+            macro_data_lagged[column + str(1)] = macro_data[column].shift(1)
+            macro_data_lagged[column + str(2)] = macro_data[column].shift(2)
+            macro_data_lagged[column + str(3)] = macro_data[column].shift(3)
+            macro_data_lagged[column + str(4)] = macro_data[column].shift(4)
+            macro_data_lagged['year'] = macro_data['year']
 
-print(macro_data)
+output_for_regression = output.merge(macro_data_lagged, on='year')
+
+print(output_for_regression)
